@@ -70,6 +70,7 @@ public class TurnManager : MonoBehaviour
     [SerializeField] GameObject MainUIParent;
 
     [SerializeField] GameObject attackOptionsParent;
+    [SerializeField] GameObject attackOptionsMenu;
 
     [SerializeField] GameObject potionOptions;
 
@@ -125,6 +126,8 @@ public class TurnManager : MonoBehaviour
 
     private int Potion = 1;
     private int Panacea = 1;
+
+    [SerializeField] GameObject[] listOfObjectToDeactivateAtStartOfBattle;
 
     private void Awake()
     {
@@ -192,6 +195,10 @@ public class TurnManager : MonoBehaviour
 
         hero = bossObj.GetComponent<Hero>();
 
+        foreach(var obj in listOfObjectToDeactivateAtStartOfBattle)
+        {
+            obj.SetActive(false);
+        }
         hero.Init(popupPrefab);
 
         bossHUD.Init(hero);
@@ -436,13 +443,16 @@ public class TurnManager : MonoBehaviour
     {
         for (int i = 0; i < attackButtons.Length; i++)
         {
-            if (enemyAttacksByIndex[i] != null)
+            if (enemyAttacksByIndex.Capacity > i)
             {
-                attackButtons[i].GetComponentInChildren<TextMeshProUGUI>().text = enemyAttacksByIndex[i].attackName;
-                int index = i;
-                attackButtons[i].onClick.RemoveAllListeners();
-                attackButtons[i].onClick.AddListener(() => OnAttackButtonClicked(index));
-                attackButtons[i].gameObject.SetActive(true);
+                if (enemyAttacksByIndex[i] != null)
+                {
+                    attackButtons[i].GetComponentInChildren<TextMeshProUGUI>().text = enemyAttacksByIndex[i].attackName;
+                    int index = i;
+                    attackButtons[i].onClick.RemoveAllListeners();
+                    attackButtons[i].onClick.AddListener(() => OnAttackButtonClicked(index));
+                    attackButtons[i].gameObject.SetActive(true);
+                }               
             }
             else
             {
@@ -493,6 +503,7 @@ public class TurnManager : MonoBehaviour
             selectedAttack2 = null;
 
             attackOptionsParent.SetActive(false);
+            attackOptionsMenu.SetActive(false);
             potionOptions.SetActive(false);
             targetingHUDParent.SetActive(true);
             targetingMode = true;
